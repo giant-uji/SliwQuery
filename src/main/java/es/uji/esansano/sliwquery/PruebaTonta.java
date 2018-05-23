@@ -14,12 +14,12 @@ import java.util.Map;
 public class PruebaTonta {
 
     private static final MLServiceImpl mlService = new MLServiceImpl();
-    private static final DateTime FROM = new DateTime(2018, 5, 17, 0, 0);
-    private static final DateTime TO = new DateTime(2018, 5, 21, 12, 30);
+    private static final DateTime FROM = new DateTime(2018, 5, 13, 0, 0);
+    private static final DateTime TO = new DateTime(2018, 5, 23, 22, 30);
 //    private static final String USER = "Emilio Prueba";
 //    private static final String USER = "Prueba Oscar";
 //    private static final String USER = "Prueba Raul";
-    private static final String USER = "Prueba Arturo";
+    private static final String USER = "arturo";
 
     public static void main(String[] args) {
 //        List<Device> devices = SliwQuery.getDevices();

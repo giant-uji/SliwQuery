@@ -20,6 +20,8 @@ import java.util.stream.Collectors;
 
 public class MLServiceImpl implements MLService {
 
+    private static final String UNKNOWN_LOCATION = "Localización desconocida";
+
     @Override
     public List<Classifier> buildClassifiers(User user, List<Sample> validSamples) {
 
@@ -57,8 +59,10 @@ public class MLServiceImpl implements MLService {
 
     @Override
     public String classify(User user, Sample sample) {
+        if (sample.getScanResults().size() == 0) {
+            return UNKNOWN_LOCATION;
+        }
 
-        System.out.println("ScanResults size: " + sample.getScanResults().size());
         Instances trainingSet = new TrainingSetBuilder()
                 .setAttributes(user.getBssids())
                 .setClassAttribute("Location", user.getLocations().stream()
@@ -72,12 +76,18 @@ public class MLServiceImpl implements MLService {
 
         Instance instance = new Instance(trainingSet.numAttributes());
 
+        int hits = 0;
         for (Enumeration e = trainingSet.enumerateAttributes(); e.hasMoreElements();) {
             Attribute attribute = (Attribute) e.nextElement();
             String bssid = attribute.name();
             int level = (BSSIDLevelMap.containsKey(bssid)) ? BSSIDLevelMap.get(bssid) : 0;
+            if (level < 0) {
+                hits++;
+            }
             instance.setValue(attribute, level);
         }
+
+        System.out.println("hits: " + hits);
 
         if (sample.getLocation() != null)
             instance.setValue(trainingSet.classAttribute(), sample.getLocation());
@@ -87,7 +97,12 @@ public class MLServiceImpl implements MLService {
 
         int predictedClass = classify(fromBase64(user.getClassifiers()), instance);
 
-        return trainingSet.classAttribute().value(predictedClass);
+        String location = UNKNOWN_LOCATION;
+        if (predictedClass >= 0 && hits > 0) {
+            location = trainingSet.classAttribute().value(predictedClass);
+        }
+
+        return location;
     }
 
     private boolean classifierOK(Classifier classifier) {
@@ -95,7 +110,7 @@ public class MLServiceImpl implements MLService {
         if (name.contains("RandomForest") || name.contains("BayesNet")) {
             return true;
         } else {
-            return true;
+            return false;
         }
     }
 
