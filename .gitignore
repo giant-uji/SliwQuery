@@ -52,3 +52,7 @@ fabric.properties
 .idea/httpRequests
 
 *.class
+
+\.idea/
+
+sliwquery\.iml
