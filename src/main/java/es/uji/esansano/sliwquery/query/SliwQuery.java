@@ -34,8 +34,8 @@ public class SliwQuery {
         Report report = new Report();
         if (user != null) {
             List<Sample> samples = getSamples(user, from, to, local);
-            report.setSamples(samples);
             report = new Report(user.getName(), from, to);
+            report.setSamples(samples);
         }
         return report;
     }
@@ -106,7 +106,9 @@ public class SliwQuery {
             if (local) {
                 sample.setLocation(mlService.getLocalPrediction(user, sample, false));
             }
-            samples.add(sample);
+            if (!sample.isValid()) {
+                samples.add(sample);
+            }
         }
 
         Collections.sort(samples);

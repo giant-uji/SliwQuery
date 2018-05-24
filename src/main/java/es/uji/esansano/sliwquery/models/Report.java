@@ -10,7 +10,7 @@ public class Report {
     private String user;
     private DateTime fromDate;
     private DateTime toDate;
-    private List<LocationInterval> intervals;
+    private List<LocationInterval> intervals = new ArrayList<>();
     private List<Sample> samples;
 
     public Report() {
@@ -20,7 +20,6 @@ public class Report {
         this.user = user;
         this.fromDate = fromDate;
         this.toDate = toDate;
-        intervals = new ArrayList<>();
     }
 
     public List<Sample> getSamples() {
