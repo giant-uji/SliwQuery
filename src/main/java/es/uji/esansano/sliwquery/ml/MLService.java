@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface MLService {
 
-    List<Classifier> buildClassifiers(User user, List<Sample> samples);
-    String classify(User user, Sample sample);
+    List<Classifier> buildClassifiers(User user, List<Sample> samples, boolean log);
+    String classify(User user, Sample sample, boolean log);
 
 }

@@ -23,7 +23,7 @@ public class MLServiceImpl implements MLService {
     private static final String UNKNOWN_LOCATION = "Localización desconocida";
 
     @Override
-    public List<Classifier> buildClassifiers(User user, List<Sample> validSamples) {
+    public List<Classifier> buildClassifiers(User user, List<Sample> validSamples, boolean log) {
 
         Instances trainingSet = new TrainingSetBuilder()
                 .setAttributes(user.getBssids())
@@ -58,7 +58,7 @@ public class MLServiceImpl implements MLService {
     }
 
     @Override
-    public String classify(User user, Sample sample) {
+    public String classify(User user, Sample sample, boolean log) {
         if (sample.getScanResults().size() == 0) {
             return UNKNOWN_LOCATION;
         }
@@ -86,8 +86,9 @@ public class MLServiceImpl implements MLService {
             }
             instance.setValue(attribute, level);
         }
-
-        System.out.println("hits: " + hits);
+        if (log) {
+            System.out.println("hits: " + hits);
+        }
 
         if (sample.getLocation() != null)
             instance.setValue(trainingSet.classAttribute(), sample.getLocation());
@@ -95,7 +96,7 @@ public class MLServiceImpl implements MLService {
         instance.setDataset(trainingSet);
         trainingSet.add(instance);
 
-        int predictedClass = classify(fromBase64(user.getClassifiers()), instance);
+        int predictedClass = classify(fromBase64(user.getClassifiers()), instance, log);
 
         String location = UNKNOWN_LOCATION;
         if (predictedClass >= 0 && hits > 0) {
@@ -114,7 +115,7 @@ public class MLServiceImpl implements MLService {
         }
     }
 
-    private int classify(List<Classifier> classifiers, Instance instance) {
+    private int classify(List<Classifier> classifiers, Instance instance, boolean log) {
 
 //        List<Double> predictedClasses = classifiers.stream()
 //                .map(classifier -> {
@@ -125,23 +126,24 @@ public class MLServiceImpl implements MLService {
 //                    }
 //                }).collect(Collectors.toList());
 
-        System.out.println("Prediction |                     Distribution                  |    Classifier");
+        if (log) {
+            System.out.println("Prediction |                     Distribution                  |    Classifier");
 
-        for (Classifier classifier: classifiers) {
-            StringBuilder stringBuilder = new StringBuilder();
-            try {
-                int predictedClass = (int) classifier.classifyInstance(instance);
-                stringBuilder.append(String.format("%6d     |  ", predictedClass));
-                for (Double dbl: classifier.distributionForInstance(instance)) {
-                    stringBuilder.append(String.format("%.4f ", dbl));
+            for (Classifier classifier : classifiers) {
+                StringBuilder stringBuilder = new StringBuilder();
+                try {
+                    int predictedClass = (int) classifier.classifyInstance(instance);
+                    stringBuilder.append(String.format("%6d     |  ", predictedClass));
+                    for (Double dbl : classifier.distributionForInstance(instance)) {
+                        stringBuilder.append(String.format("%.4f ", dbl));
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
+                stringBuilder.append("| ").append(classifier.getClass().getSimpleName());
+                System.out.println(stringBuilder.toString());
             }
-            stringBuilder.append("| ").append(classifier.getClass().getSimpleName());
-            System.out.println(stringBuilder.toString());
         }
-
 
         List<Double> predictedClasses = classifiers.stream()
                 .filter(classifier -> classifierOK(classifier))
@@ -200,6 +202,11 @@ public class MLServiceImpl implements MLService {
         });
 
         return classifiers;
+    }
+
+
+    public String getLocalPrediction(User user, Sample sample, boolean log) {
+        return classify(user, sample, log);
     }
 
     public static byte[] toByteArray(Classifier classifier) throws IOException {
