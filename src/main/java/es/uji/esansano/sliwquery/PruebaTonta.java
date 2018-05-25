@@ -19,13 +19,13 @@ public class PruebaTonta {
 
     public static void main(String[] args) {
         Map<String, User> userMap = SliwQuery.getUserMap();
-        User user = userMap.get(USERS[3]);
-        Report report = SliwQuery.getReport(user, FROM, TO, true);
+        User user = userMap.get(USERS[2]);
+        Report report = SliwQuery.getReport(user, FROM, TO, false);
 
         Output.printUsers(userMap.values());
         Output.printLocations(user, report, true);
         Output.printReport(report, 0, null, null);
-        Output.printReport(report, 2, null, null);
-        Output.printReport(report, 4, null, null);
+        Output.printReport(report, 5, null, null);
+        Output.printReport(report, 10, null, null);
     }
 }
