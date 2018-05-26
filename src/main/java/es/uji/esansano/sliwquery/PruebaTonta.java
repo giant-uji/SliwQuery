@@ -10,22 +10,21 @@ import java.util.Map;
 
 public class PruebaTonta {
 
-    private static final DateTime FROM = new DateTime(2018, 5, 24, 16, 0);
-    private static final DateTime TO = new DateTime(2018, 5, 25, 20, 0);
+    private static final DateTime FROM = new DateTime(2018, 5, 24, 18, 30);
+    private static final DateTime TO = new DateTime(2018, 5, 28, 10, 0);
 
     private static final String[] USERS = new String[]{
-      "oscar", "arturo", "raul", "emilio"
+      "oscar3", "arturo", "raul", "emilio"
     };
 
     public static void main(String[] args) {
         Map<String, User> userMap = SliwQuery.getUserMap();
-        User user = userMap.get(USERS[2]);
+        User user = userMap.get(USERS[3]);
         Report report = SliwQuery.getReport(user, FROM, TO, false);
 
         Output.printUsers(userMap.values());
-        Output.printLocations(user, report, true);
-        Output.printReport(report, 0, null, null);
+        // Output.printLocations(user, report, false);
+        // Output.printReport(report, 0, null, null);
         Output.printReport(report, 5, null, null);
-        Output.printReport(report, 10, null, null);
     }
 }

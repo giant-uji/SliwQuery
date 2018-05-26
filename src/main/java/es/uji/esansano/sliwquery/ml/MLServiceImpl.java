@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 public class MLServiceImpl implements MLService {
 
-    private static final String UNKNOWN_LOCATION = "Localización desconocida";
+    public static final String UNKNOWN_LOCATION = "Localización desconocida";
 
     @Override
     public List<Classifier> buildClassifiers(User user, List<Sample> validSamples, boolean log) {
@@ -90,8 +90,9 @@ public class MLServiceImpl implements MLService {
             System.out.println("hits: " + hits);
         }
 
-        if (sample.getLocation() != null)
+        if (sample.getLocation() != null && !sample.getLocation().equals(UNKNOWN_LOCATION)) {
             instance.setValue(trainingSet.classAttribute(), sample.getLocation());
+        }
 
         instance.setDataset(trainingSet);
         trainingSet.add(instance);
