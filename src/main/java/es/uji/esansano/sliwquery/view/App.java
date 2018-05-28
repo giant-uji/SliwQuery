@@ -9,6 +9,9 @@ import es.uji.esansano.sliwquery.query.SliwQuery;
 import org.elasticsearch.common.joda.time.DateTime;
 
 import javax.swing.*;
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.*;
 import java.util.Map;
 
@@ -30,6 +33,7 @@ public class App {
     private DatePicker toDatePicker;
     private TimePicker fromTimePicker;
     private TimePicker toTimePicker;
+    private JButton buttonCopy;
 
     private Map<String, User> userMap;
     private String userName = "";
@@ -59,7 +63,15 @@ public class App {
             }
         });
 
-        //resultArea = new JTextArea();
+        buttonCopy.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String result = resultArea.getText();
+                StringSelection stringSelection = new StringSelection(result);
+                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                clipboard.setContents(stringSelection, null);
+            }
+        });
     }
 
     public static void main(String[] args) {
