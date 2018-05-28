@@ -20,7 +20,8 @@ import java.util.stream.Collectors;
 
 public class MLServiceImpl implements MLService {
 
-    public static final String UNKNOWN_LOCATION = "Localización desconocida";
+    public static final String UNKNOWN_LOCATION = "Fuera de casa";
+    public static final String NO_DATA_AVAILABLE = "Sin datos";
 
     @Override
     public List<Classifier> buildClassifiers(User user, List<Sample> validSamples, boolean log) {

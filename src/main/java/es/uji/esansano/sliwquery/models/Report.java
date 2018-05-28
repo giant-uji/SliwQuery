@@ -66,7 +66,7 @@ public class Report {
                         if (closeInterval) {
                             if (timeInterval > UNKNOWN_INTERVAL) {
                                 addInterval(currentLocation, startDate, prevDate);
-                                currentLocation = MLServiceImpl.UNKNOWN_LOCATION;
+                                currentLocation = MLServiceImpl.NO_DATA_AVAILABLE;
                                 startDate = prevDate;
                             } else {
                                 addInterval(currentLocation, startDate, currentSample.getDate());
