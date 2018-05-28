@@ -8,7 +8,7 @@ import java.util.List;
 
 public class Report {
 
-    private static final float UNKNOWN_INTERVAL = 10;
+    private float UNKNOWN_INTERVAL = 10;
     private String user;
     private DateTime fromDate;
     private DateTime toDate;
@@ -114,6 +114,33 @@ public class Report {
         }
     }
 
+    public String getReport(float filterThreshold, DateTime from, DateTime to) {
+        String temp = "";
+        if (user != null) {
+            temp += (String.format("\n\nInforme para el usuario: %s", user)) + "\n";
+            if (from == null) from = fromDate;
+            if (to == null) to = toDate;
+            String date1 = from.toString("dd/MM HH:mm:ss");
+            String date2 = to.toString("dd/MM HH:mm:ss");
+            temp += (String.format("Desde %14s hasta %14s", date1, date2)) + "\n";
+            temp += (String.format("Valor de tiempo umbral: %f minutos.", filterThreshold)) + "\n";
+            temp += ("------------------------------------------------------------------") + "\n";
+            if (intervals.size() == 0) {
+                temp += ("No hay localizaciones.") + "\n";
+            } else {
+                List<LocationInterval> filteredIntervals = getFilteredIntervals(filterThreshold);
+                for (LocationInterval interval : filteredIntervals) {
+                    temp += (interval) + "\n";
+                }
+            }
+            temp += getStats() + "\n";
+        } else {
+            temp += ("No existe el usuario en la base de datos.") +"\n";
+        }
+
+        return  temp;
+    }
+
     private void printStats() {
         System.out.println();
         float period = ((timeLastSample - timeFirstSample) / 3600000f);
@@ -123,6 +150,18 @@ public class Report {
         System.out.println(String.format("%-40s%d (%3.2f%%)", "Number of samples with scan data: ", samplesWithScan, (100f * samplesWithScan) / samples.size()));
         System.out.println(String.format("%-40s%2.2f", "Average number of samples per hour: ", samples.size() / period));
 
+    }
+
+    private String getStats() {
+        String temp = "\n";
+        float period = ((timeLastSample - timeFirstSample) / 3600000f);
+        float length = ((toDate.getMillis() - fromDate.getMillis()) / 3600000f);
+        temp += (String.format("%-40s%2.2f%s", "Report period length: ", length, " hours")) + "\n";
+        temp += (String.format("%-40s%d", "Number of samples: ", samples.size())) + "\n";
+        temp += (String.format("%-40s%d (%3.2f%%)", "Number of samples with scan data: ", samplesWithScan, (100f * samplesWithScan) / samples.size())) + "\n";
+        temp += (String.format("%-40s%2.2f", "Average number of samples per hour: ", samples.size() / period))+ "\n";
+
+        return temp;
     }
 
     private List<LocationInterval> getFilteredIntervals(float filterThreshold) {
@@ -179,5 +218,9 @@ public class Report {
             String date2 = toDate.toString("dd/MM HH:mm:ss");
             return String.format("Desde %14s hasta %14s en: %-25s", date1, date2, location);
         }
+    }
+
+    public void setUNKNOWN_INTERVAL(int value) {
+        UNKNOWN_INTERVAL = value;
     }
 }

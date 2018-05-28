@@ -49,4 +49,9 @@ public class Output {
         report.printReport(threshold, from, to);
     }
 
+    public static String getReport(Report report, float threshold, DateTime from, DateTime to) {
+        String reportString = report.getReport(threshold, from, to);
+        return reportString;
+    }
+
 }

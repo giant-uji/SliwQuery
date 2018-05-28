@@ -22,6 +22,7 @@ public class PruebaTonta {
         User user = userMap.get(USERS[3]);
         Report report = SliwQuery.getReport(user, FROM, TO, false);
 
+
         Output.printUsers(userMap.values());
         //Output.printLocations(user, report, true);
         // Output.printReport(report, 0, null, null);
