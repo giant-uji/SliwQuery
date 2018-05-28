@@ -23,7 +23,7 @@ public class PruebaTonta {
         Report report = SliwQuery.getReport(user, FROM, TO, false);
 
         Output.printUsers(userMap.values());
-        // Output.printLocations(user, report, false);
+        //Output.printLocations(user, report, true);
         // Output.printReport(report, 0, null, null);
         Output.printReport(report, 5, null, null);
     }
