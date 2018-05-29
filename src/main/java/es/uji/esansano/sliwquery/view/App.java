@@ -13,6 +13,9 @@ import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.*;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Map;
 
 public class App {
@@ -39,16 +42,13 @@ public class App {
     private String userName = "";
 
     public App() {
-        usersLabel.setText("Users:");
-        fromLabel.setText("From:");
 
         userMap = SliwQuery.getUserMap();
         for (Map.Entry<String, User> entry : userMap.entrySet()) {
             usersBox.addItem(entry.getKey());
         }
 
-        thresholdField.setText("5");
-        intervalField.setText("10");
+        setDefaultValues();
 
         usersBox.addItemListener(new ItemListener() {
             @Override
@@ -62,7 +62,6 @@ public class App {
                 makeReport();
             }
         });
-
         buttonCopy.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -70,6 +69,12 @@ public class App {
                 StringSelection stringSelection = new StringSelection(result);
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
                 clipboard.setContents(stringSelection, null);
+            }
+        });
+        buttonCancel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                setDefaultValues();
             }
         });
     }
@@ -99,7 +104,6 @@ public class App {
         DateTime TO = new DateTime(yearTO, monthTO, dayTO, toHour, toMin);
 
         User user = userMap.get(userName);
-        System.out.println(user);
         Report report = SliwQuery.getReport(user, FROM, TO, false);
         report.setUNKNOWN_INTERVAL(Integer.valueOf(intervalField.getText()));
         int threshhold = Integer.valueOf(thresholdField.getText());
@@ -109,4 +113,13 @@ public class App {
         resultArea.setText(reportResult);
     }
 
+    public void setDefaultValues() {
+        resultArea.setText("");
+        thresholdField.setText("5");
+        intervalField.setText("10");
+        fromDatePicker.setDate(LocalDate.now().with(DayOfWeek.MONDAY));
+        fromTimePicker.setTime(LocalTime.MIDNIGHT);
+        toDatePicker.setDate(LocalDate.now().with(DayOfWeek.SUNDAY));
+        toTimePicker.setTime(LocalTime.MIDNIGHT);
+    }
 }

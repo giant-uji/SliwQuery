@@ -156,10 +156,10 @@ public class Report {
         String temp = "\n";
         float period = ((timeLastSample - timeFirstSample) / 3600000f);
         float length = ((toDate.getMillis() - fromDate.getMillis()) / 3600000f);
-        temp += (String.format("%-40s%2.2f%s", "Report period length: ", length, " hours")) + "\n";
-        temp += (String.format("%-40s%d", "Number of samples: ", samples.size())) + "\n";
-        temp += (String.format("%-40s%d (%3.2f%%)", "Number of samples with scan data: ", samplesWithScan, (100f * samplesWithScan) / samples.size())) + "\n";
-        temp += (String.format("%-40s%2.2f", "Average number of samples per hour: ", samples.size() / period))+ "\n";
+        temp += (String.format("%-40s%2.2f%s", "Periodo del informe: ", length, " hours")) + "\n";
+        temp += (String.format("%-40s%d", "Número de muestras: ", samples.size())) + "\n";
+        temp += (String.format("%-40s%d (%3.2f%%)", "Número de muestras escaneadas: ", samplesWithScan, (100f * samplesWithScan) / samples.size())) + "\n";
+        temp += (String.format("%-40s%2.2f", "Media de muestras por hora: ", samples.size() / period))+ "\n";
 
         return temp;
     }
