@@ -35,6 +35,8 @@ public class Output {
             System.out.println("No hay localizaciones disponibles.");
         }
         System.out.println("\n");
+
+
     }
 
     public static void printUsers(Collection<User> users) {

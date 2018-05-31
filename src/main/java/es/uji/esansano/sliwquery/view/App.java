@@ -45,7 +45,9 @@ public class App {
 
         userMap = SliwQuery.getUserMap();
         for (Map.Entry<String, User> entry : userMap.entrySet()) {
-            usersBox.addItem(entry.getKey());
+            String [] splitKey = entry.getKey().split(" ");
+            if (!splitKey[0].equals("borrar"))
+                usersBox.addItem(entry.getKey());
         }
 
         setDefaultValues();
@@ -80,7 +82,7 @@ public class App {
     }
 
     public static void main(String[] args) {
-        JFrame frame = new JFrame("App");
+        JFrame frame = new JFrame("Senior Monitoring - Generador de informes");
         frame.setContentPane(new App().panelMain);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
