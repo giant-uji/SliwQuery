@@ -43,7 +43,12 @@ public class App {
 
     public App() {
 
-        userMap = SliwQuery.getUserMap();
+
+        SliwQuery seniorQuery = new SliwQuery(9300);
+        SliwQuery controlQuery = new SliwQuery(9500);
+
+
+        userMap = seniorQuery.getUserMap();
         for (Map.Entry<String, User> entry : userMap.entrySet()) {
             String [] splitKey = entry.getKey().split(" ");
             if (!splitKey[0].equals("borrar"))
@@ -61,7 +66,7 @@ public class App {
         buttonReport.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                makeReport();
+                makeReport(seniorQuery);
             }
         });
         buttonCopy.addActionListener(new ActionListener() {
@@ -89,7 +94,7 @@ public class App {
         frame.setVisible(true);
     }
 
-    public void makeReport() {
+    public void makeReport(SliwQuery query) {
         int dayFROM = fromDatePicker.getDate().getDayOfMonth();
         int monthFROM = fromDatePicker.getDate().getMonthValue();
         int yearFROM = fromDatePicker.getDate().getYear();
@@ -106,7 +111,7 @@ public class App {
         DateTime TO = new DateTime(yearTO, monthTO, dayTO, toHour, toMin);
 
         User user = userMap.get(userName);
-        Report report = SliwQuery.getReport(user, FROM, TO, false);
+        Report report = query.getReport(user, FROM, TO, false);
         report.setUNKNOWN_INTERVAL(Integer.valueOf(intervalField.getText()));
         int threshhold = Integer.valueOf(thresholdField.getText());
 

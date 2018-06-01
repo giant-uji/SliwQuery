@@ -20,17 +20,23 @@ import java.util.*;
 
 public class SliwQuery {
 
+    private int port;
 
-    public static Map<String, User> getUserMap() {
+    public SliwQuery(int port) {
+        this.port = port;
+    }
+
+
+    public Map<String, User> getUserMap() {
         Map<String, User> nameUserMap = new HashMap<>();
-        for (User user: SliwQuery.getUsers()) {
+        for (User user: getUsers()) {
             nameUserMap.put(user.getName(), user);
         }
         return nameUserMap;
     }
 
 
-    public static Report getReport(User user, DateTime from, DateTime to, boolean local) {
+    public Report getReport(User user, DateTime from, DateTime to, boolean local) {
         Report report = new Report();
         if (user != null) {
             List<Sample> samples = getSamples(user, from, to, local);
@@ -41,10 +47,10 @@ public class SliwQuery {
     }
 
 
-    public static List<Device> getDevices() {
+    public List<Device> getDevices() {
 
         Client client = new TransportClient()
-                .addTransportAddress(new InetSocketTransportAddress("indoorlocplatform.uji.es", 9300));
+                .addTransportAddress(new InetSocketTransportAddress("indoorlocplatform.uji.es", port));
 
         SearchResponse response = client.prepareSearch("sliw")
                 .setTypes("devices")
@@ -71,12 +77,12 @@ public class SliwQuery {
     }
 
 
-    private static List<Sample> getSamples(User user, DateTime from, DateTime to, boolean local) {
+    private List<Sample> getSamples(User user, DateTime from, DateTime to, boolean local) {
         List<Sample> samples = new ArrayList<Sample>();
         MLServiceImpl mlService = new MLServiceImpl();
 
         Client client = new TransportClient()
-                .addTransportAddress(new InetSocketTransportAddress("indoorlocplatform.uji.es", 9300));
+                .addTransportAddress(new InetSocketTransportAddress("indoorlocplatform.uji.es", port));
 
         QueryBuilder qb = QueryBuilders.boolQuery()
                 //.must(QueryBuilders.termQuery("valid", "false"))
@@ -117,10 +123,10 @@ public class SliwQuery {
     }
 
 
-    private static List<User> getUsers() {
+    private List<User> getUsers() {
 
         Client client = new TransportClient()
-                .addTransportAddress(new InetSocketTransportAddress("indoorlocplatform.uji.es", 9300));
+                .addTransportAddress(new InetSocketTransportAddress("indoorlocplatform.uji.es", port));
 
         SearchResponse response = client.prepareSearch("sliw")
                 .setTypes("users")
