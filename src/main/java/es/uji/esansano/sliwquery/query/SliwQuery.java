@@ -152,7 +152,6 @@ public class SliwQuery {
 
         // Samples that have been validated
         List<Sample> samples = getSamples(user, from, to, valid);
-        String location = label;
         String bssid = "";
         int observations = samples.size();
 
@@ -161,6 +160,7 @@ public class SliwQuery {
 
         // Labels of the csv file
         String[] labels = new String[observations];
+        String[] clabels = new String[observations];
         int index = 0;
 
         StringJoiner csvHeader = new StringJoiner(",");
@@ -170,7 +170,6 @@ public class SliwQuery {
         if (valid) {
             // Extract BSSID, level and location from data
             for (Sample sample: samples) {
-                location = sample.getLocation();
                 rows[index] = new StringJoiner(",");
                 for (Sample.WifiScanResult scan: sample.getScanResults()) {
                     bssid = scan.BSSID;
@@ -178,7 +177,7 @@ public class SliwQuery {
                         features.put(bssid, new int[observations]);
                     }
                     features.get(bssid)[index] = scan.level;
-                    labels[index] = location;
+                    labels[index] = sample.getLocation();
                 }
                 index++;
             }
@@ -191,7 +190,6 @@ public class SliwQuery {
             }
             // Extract level from data
             for (Sample sample: samples) {
-                location = label;
                 rows[index] = new StringJoiner(",");
                 for (Sample.WifiScanResult scan: sample.getScanResults()) {
                     bssid = scan.BSSID;
@@ -199,7 +197,8 @@ public class SliwQuery {
                         features.get(bssid)[index] = scan.level;
                     }
                 }
-                labels[index] = location;
+                clabels[index] = sample.getLocation();
+                labels[index] = label;
                 index++;
             }
         }
@@ -216,9 +215,15 @@ public class SliwQuery {
         try {
             Writer writer = new FileWriter(fileName);
             csvHeader.add("label");
+            if (!valid) {
+                csvHeader.add("clabel");
+            }
             writer.append(csvHeader.toString()).append("\n");
             for (int i = 0; i < observations; i++) {
                 rows[i].add(labels[i]);
+                if (!valid) {
+                    rows[i].add(clabels[i]);
+                }
                 writer.append(rows[i].toString()).append("\n");
             }
             writer.close();
