@@ -1,8 +1,9 @@
 package es.uji.esansano.sliwquery;
 
-import es.uji.esansano.sliwquery.models.Period;
+import es.uji.esansano.sliwquery.models.Interval;
 import es.uji.esansano.sliwquery.models.User;
 import es.uji.esansano.sliwquery.query.SliwQuery;
+import es.uji.esansano.sliwquery.utils.Utils;
 import org.elasticsearch.common.joda.time.DateTime;
 
 import java.util.*;
@@ -25,25 +26,6 @@ public class WriteCSV {
         controlQuery.generateValidatedCSV(user, from, to);
 
         // Save training data in csv format
-        List<Period> periods = new ArrayList<>();
-        periods.add(new Period(
-                new DateTime(2018, 6, 1, 21, 21),
-                new DateTime(2018, 6, 1, 23, 39),
-                "Salón")
-        );
-
-        periods.add(new Period(
-                new DateTime(2018, 6, 1, 23, 40),
-                new DateTime(2018, 6, 2, 8, 14),
-                "Dormitorio")
-        );
-
-        periods.add(new Period(
-                new DateTime(2018, 6, 2, 8, 15),
-                new DateTime(2018, 6, 2, 15, 14),
-                "Cocina")
-        );
-
-        controlQuery.generateTrainingCSV(user, periods);
+        controlQuery.generateTrainingCSV(user);
     }
 }

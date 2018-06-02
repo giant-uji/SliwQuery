@@ -2,7 +2,7 @@ package es.uji.esansano.sliwquery;
 
 import es.uji.esansano.sliwquery.models.Report;
 import es.uji.esansano.sliwquery.models.User;
-import es.uji.esansano.sliwquery.utils.Output;
+import es.uji.esansano.sliwquery.utils.Utils;
 import es.uji.esansano.sliwquery.query.SliwQuery;
 import org.elasticsearch.common.joda.time.DateTime;
 
@@ -27,9 +27,9 @@ public class PruebaTonta {
         Report report = controlQuery.getReport(user, FROM, TO);
 
 
-        Output.printUsers(userMap.values());
-        Output.printLocations(user, report, true);
-        // Output.printReport(report, 0, null, null);
-        Output.printReport(report, 5, null, null);
+        Utils.printUsers(userMap.values());
+        Utils.printLocations(user, report, true);
+        // Utils.printReport(report, 0, null, null);
+        Utils.printReport(report, 5, null, null);
     }
 }

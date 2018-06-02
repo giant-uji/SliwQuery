@@ -4,7 +4,7 @@ import com.github.lgooddatepicker.components.DatePicker;
 import com.github.lgooddatepicker.components.TimePicker;
 import es.uji.esansano.sliwquery.models.Report;
 import es.uji.esansano.sliwquery.models.User;
-import es.uji.esansano.sliwquery.utils.Output;
+import es.uji.esansano.sliwquery.utils.Utils;
 import es.uji.esansano.sliwquery.query.SliwQuery;
 import org.elasticsearch.common.joda.time.DateTime;
 
@@ -115,7 +115,7 @@ public class App {
         report.setUNKNOWN_INTERVAL(Integer.valueOf(intervalField.getText()));
         int threshhold = Integer.valueOf(thresholdField.getText());
 
-        String reportResult = Output.getReport(report, threshhold, null, null);
+        String reportResult = Utils.getReport(report, threshhold, null, null);
 
         resultArea.setText(reportResult);
     }

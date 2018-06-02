@@ -1,16 +1,17 @@
 package es.uji.esansano.sliwquery.utils;
 
 import es.uji.esansano.sliwquery.ml.MLServiceImpl;
-import es.uji.esansano.sliwquery.models.Device;
-import es.uji.esansano.sliwquery.models.Report;
-import es.uji.esansano.sliwquery.models.Sample;
-import es.uji.esansano.sliwquery.models.User;
+import es.uji.esansano.sliwquery.models.*;
 import org.elasticsearch.common.joda.time.DateTime;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class Output {
+public class Utils {
 
     private static final MLServiceImpl mlService = new MLServiceImpl();
 
@@ -56,4 +57,23 @@ public class Output {
         return reportString;
     }
 
+
+    public static List<Interval> getIntervals(String userName) {
+        List<Interval> intervals = new ArrayList<>();
+        String fileName = "data/" + userName + ".csv";
+        try {
+            BufferedReader intervalCsv = new BufferedReader(new FileReader(fileName));
+            String line;
+            while ((line = intervalCsv.readLine()) != null) {
+                String[] lineData = line.split(",");
+                intervals.add(new Interval(
+                        lineData[0], lineData[1], lineData[2]
+                ));
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return intervals;
+    }
 }

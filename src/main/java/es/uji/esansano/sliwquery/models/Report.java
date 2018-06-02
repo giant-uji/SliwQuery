@@ -12,7 +12,7 @@ public class Report {
     private String user;
     private DateTime fromDate;
     private DateTime toDate;
-    private List<LocationInterval> intervals = new ArrayList<>();
+    private List<Interval> intervals = new ArrayList<>();
     private List<Sample> samples;
 
     private int samplesWithScan;
@@ -86,7 +86,7 @@ public class Report {
     }
 
     private void addInterval(String location, DateTime from, DateTime to) {
-        intervals.add(new LocationInterval(location, from, to));
+        intervals.add(new Interval(from, to, location));
     }
 
 
@@ -103,8 +103,8 @@ public class Report {
             if (intervals.size() == 0) {
                 System.out.println("No hay localizaciones.");
             } else {
-                List<LocationInterval> filteredIntervals = getFilteredIntervals(filterThreshold);
-                for (LocationInterval interval : filteredIntervals) {
+                List<Interval> filteredIntervals = getFilteredIntervals(filterThreshold);
+                for (Interval interval : filteredIntervals) {
                     System.out.println(interval);
                 }
             }
@@ -128,8 +128,8 @@ public class Report {
             if (intervals.size() == 0) {
                 temp += ("No hay localizaciones.") + "\n";
             } else {
-                List<LocationInterval> filteredIntervals = getFilteredIntervals(filterThreshold);
-                for (LocationInterval interval : filteredIntervals) {
+                List<Interval> filteredIntervals = getFilteredIntervals(filterThreshold);
+                for (Interval interval : filteredIntervals) {
                     temp += (interval) + "\n";
                 }
             }
@@ -164,17 +164,17 @@ public class Report {
         return temp;
     }
 
-    private List<LocationInterval> getFilteredIntervals(float filterThreshold) {
-        List<LocationInterval> filteredIntervals = new ArrayList<>();
+    private List<Interval> getFilteredIntervals(float filterThreshold) {
+        List<Interval> filteredIntervals = new ArrayList<>();
         if (intervals.size() > 0) {
-            LocationInterval currentInterval = intervals.get(0).getCopy();
+            Interval currentInterval = intervals.get(0).getCopy();
             filteredIntervals.add(currentInterval);
             int intervalIndex = 1;
             while (intervalIndex < intervals.size()) {
                 boolean combine = intervals.get(intervalIndex).getDuration() < filterThreshold ||
-                        intervals.get(intervalIndex).location.equals(currentInterval.location);
-                if (combine && !currentInterval.location.equals(MLServiceImpl.UNKNOWN_LOCATION)) {
-                    currentInterval.toDate = intervals.get(intervalIndex).toDate;
+                        intervals.get(intervalIndex).getLocation().equals(currentInterval.getLocation());
+                if (combine && !currentInterval.getLocation().equals(MLServiceImpl.UNKNOWN_LOCATION)) {
+                    currentInterval.setToDate(intervals.get(intervalIndex).getToDate());
                 } else {
                     currentInterval = intervals.get(intervalIndex).getCopy();
                     filteredIntervals.add(currentInterval);
@@ -184,40 +184,6 @@ public class Report {
         }
 
         return filteredIntervals;
-    }
-
-    private class LocationInterval implements Comparable<LocationInterval> {
-
-        private String location;
-        private DateTime fromDate;
-        private DateTime toDate;
-
-        private LocationInterval(String location, DateTime fromDate, DateTime toDate) {
-            this.location = location;
-            this.fromDate = fromDate;
-            this.toDate = toDate;
-        }
-
-        // Returns the length of the interval in minutes.
-        private float getDuration() {
-            return (toDate.getMillis() - fromDate.getMillis()) / 60000;
-        }
-
-        private LocationInterval getCopy() {
-            return new LocationInterval(location, fromDate, toDate);
-        }
-
-        @Override
-        public int compareTo(LocationInterval other) {
-            return fromDate.compareTo(other.fromDate);
-        }
-
-        @Override
-        public String toString() {
-            String date1 = fromDate.toString("dd/MM HH:mm:ss");
-            String date2 = toDate.toString("dd/MM HH:mm:ss");
-            return String.format("Desde %14s hasta %14s en: %-25s", date1, date2, location);
-        }
     }
 
     public void setUNKNOWN_INTERVAL(int value) {

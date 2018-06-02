@@ -3,6 +3,7 @@ package es.uji.esansano.sliwquery.query;
 import com.google.gson.*;
 import es.uji.esansano.sliwquery.ml.MLServiceImpl;
 import es.uji.esansano.sliwquery.models.*;
+import es.uji.esansano.sliwquery.utils.Utils;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
@@ -147,7 +148,7 @@ public class SliwQuery {
         return users;
     }
 
-    private void writeCSV(User user, DateTime from, DateTime to, boolean valid, String label, String fileName) {
+    private int writeCSV(User user, DateTime from, DateTime to, boolean valid, String label, String fileName) {
 
         // Samples that have been validated
         List<Sample> samples = getSamples(user, from, to, valid);
@@ -224,17 +225,20 @@ public class SliwQuery {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return observations;
     }
 
     public void generateValidatedCSV(User user, DateTime from, DateTime to) {
         String fileName = "data/" + user.getName() + "_validated.csv";
-        writeCSV(user, from, to, true, "", fileName);
+        int n = writeCSV(user, from, to, true, "", fileName);
+        System.out.println("Writing csv file with validated data for user " + user.getName());
+        System.out.println(n + " observations written.");
     }
 
-    private void generateTrainingCSV(User user, DateTime from, DateTime to, String label) {
+    private int generateTrainingCSV(User user, DateTime from, DateTime to, String label) {
         String fileName = "data/" + user.getName() + "_" + String.valueOf(from.getMillis()) +
                 "_" + String.valueOf(to.getMillis()) + "_" + label.toLowerCase() + ".csv";
-        writeCSV(user, from, to, false, label, fileName);
+        return writeCSV(user, from, to, false, label, fileName);
     }
 
     private List<String> getBSSIDList(User user) {
@@ -250,9 +254,13 @@ public class SliwQuery {
         return null;
     }
 
-    public void generateTrainingCSV(User user, List<Period> periods) {
-        for (Period period: periods) {
-            generateTrainingCSV(user, period.getFrom(), period.getTo(), period.getLabel());
+    public void generateTrainingCSV(User user) {
+        List<Interval> intervals = Utils.getIntervals(user.getName());
+        for (Interval interval: intervals) {
+            int n = generateTrainingCSV(user, interval.getFromDate(), interval.getToDate(), interval.getLocation());
+            System.out.println("Writing csv file with labelled data for user " + user.getName());
+            System.out.println(interval);
+            System.out.println(n + " observations written.");
         }
     }
 }
