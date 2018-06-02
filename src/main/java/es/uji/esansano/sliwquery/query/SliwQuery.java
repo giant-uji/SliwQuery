@@ -2,10 +2,7 @@ package es.uji.esansano.sliwquery.query;
 
 import com.google.gson.*;
 import es.uji.esansano.sliwquery.ml.MLServiceImpl;
-import es.uji.esansano.sliwquery.models.Device;
-import es.uji.esansano.sliwquery.models.Report;
-import es.uji.esansano.sliwquery.models.Sample;
-import es.uji.esansano.sliwquery.models.User;
+import es.uji.esansano.sliwquery.models.*;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
@@ -16,6 +13,7 @@ import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 
+import java.io.*;
 import java.util.*;
 
 public class SliwQuery {
@@ -36,10 +34,10 @@ public class SliwQuery {
     }
 
 
-    public Report getReport(User user, DateTime from, DateTime to, boolean local) {
+    public Report getReport(User user, DateTime from, DateTime to) {
         Report report = new Report();
         if (user != null) {
-            List<Sample> samples = getSamples(user, from, to, local);
+            List<Sample> samples = getSamples(user, from, to, false);
             report = new Report(user.getName(), from, to);
             report.setSamples(samples);
         }
@@ -77,7 +75,7 @@ public class SliwQuery {
     }
 
 
-    private List<Sample> getSamples(User user, DateTime from, DateTime to, boolean local) {
+    private List<Sample> getSamples(User user, DateTime from, DateTime to, boolean valid) {
         List<Sample> samples = new ArrayList<Sample>();
         MLServiceImpl mlService = new MLServiceImpl();
 
@@ -109,10 +107,7 @@ public class SliwQuery {
             JsonObject source = hitsArray.get(i).getAsJsonObject().getAsJsonObject("_source");
             Sample sample = gson.fromJson(source, Sample.class);
             sample.setDate(new DateTime(source.get("date").getAsLong()));
-            if (local) {
-                sample.setLocation(mlService.getLocalPrediction(user, sample, false));
-            }
-            if (!sample.isValid()) {
+            if (sample.isValid() == valid) {
                 samples.add(sample);
             }
         }
@@ -150,5 +145,114 @@ public class SliwQuery {
         }
 
         return users;
+    }
+
+    private void writeCSV(User user, DateTime from, DateTime to, boolean valid, String label, String fileName) {
+
+        // Samples that have been validated
+        List<Sample> samples = getSamples(user, from, to, valid);
+        String location = label;
+        String bssid = "";
+        int observations = samples.size();
+
+        // Columns of the csv file
+        Map<String, int[]> features = new HashMap<>();
+
+        // Labels of the csv file
+        String[] labels = new String[observations];
+        int index = 0;
+
+        StringJoiner csvHeader = new StringJoiner(",");
+        StringJoiner[] rows = new StringJoiner[observations];
+        List<String> bssids = null;
+
+        if (valid) {
+            // Extract BSSID, level and location from data
+            for (Sample sample: samples) {
+                location = sample.getLocation();
+                rows[index] = new StringJoiner(",");
+                for (Sample.WifiScanResult scan: sample.getScanResults()) {
+                    bssid = scan.BSSID;
+                    if (!features.containsKey(bssid)) {
+                        features.put(bssid, new int[observations]);
+                    }
+                    features.get(bssid)[index] = scan.level;
+                    labels[index] = location;
+                }
+                index++;
+            }
+            bssids = new ArrayList<>(features.keySet());
+            Collections.sort(bssids);
+        } else {
+            bssids = getBSSIDList(user);
+            for (String validatedBssid: bssids) {
+                features.put(validatedBssid, new int[observations]);
+            }
+            // Extract level from data
+            for (Sample sample: samples) {
+                location = label;
+                rows[index] = new StringJoiner(",");
+                for (Sample.WifiScanResult scan: sample.getScanResults()) {
+                    bssid = scan.BSSID;
+                    if (features.containsKey(bssid)) {
+                        features.get(bssid)[index] = scan.level;
+                    }
+                }
+                labels[index] = location;
+                index++;
+            }
+        }
+
+        // csv header and rows
+        for (String bssidHeader: bssids) {
+            csvHeader.add(bssidHeader);
+            for (int i = 0; i < observations; i++) {
+                rows[i].add(String.valueOf(features.get(bssidHeader)[i]));
+            }
+        }
+
+        // Write csv file
+        try {
+            Writer writer = new FileWriter(fileName);
+            csvHeader.add("label");
+            writer.append(csvHeader.toString()).append("\n");
+            for (int i = 0; i < observations; i++) {
+                rows[i].add(labels[i]);
+                writer.append(rows[i].toString()).append("\n");
+            }
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void generateValidatedCSV(User user, DateTime from, DateTime to) {
+        String fileName = "data/" + user.getName() + "_validated.csv";
+        writeCSV(user, from, to, true, "", fileName);
+    }
+
+    private void generateTrainingCSV(User user, DateTime from, DateTime to, String label) {
+        String fileName = "data/" + user.getName() + "_" + String.valueOf(from.getMillis()) +
+                "_" + String.valueOf(to.getMillis()) + "_" + label.toLowerCase() + ".csv";
+        writeCSV(user, from, to, false, label, fileName);
+    }
+
+    private List<String> getBSSIDList(User user) {
+        String fileName = "data/" + user.getName() + "_validated.csv";
+        try {
+            BufferedReader csvFile = new BufferedReader(new FileReader(fileName));
+            ArrayList<String> bssids = new ArrayList<>(Arrays.asList(csvFile.readLine().split(",")));
+            bssids.remove(bssids.size() - 1); // Remove "label"
+            return bssids;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public void generateTrainingCSV(User user, List<Period> periods) {
+        for (Period period: periods) {
+            generateTrainingCSV(user, period.getFrom(), period.getTo(), period.getLabel());
+        }
     }
 }

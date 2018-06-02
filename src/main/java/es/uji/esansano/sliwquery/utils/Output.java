@@ -1,4 +1,4 @@
-package es.uji.esansano.sliwquery.print;
+package es.uji.esansano.sliwquery.utils;
 
 import es.uji.esansano.sliwquery.ml.MLServiceImpl;
 import es.uji.esansano.sliwquery.models.Device;
