@@ -112,7 +112,7 @@ public class App {
         userMap = activeQuery.getUserMap();
         for (Map.Entry<String, User> entry : userMap.entrySet()) {
             String [] splitKey = entry.getKey().split(" ");
-            if (!splitKey[0].equals("borrar"))
+            if (!splitKey[0].equals("borrar") && !splitKey[0].equals("test"))
                 usersBox.addItem(entry.getKey());
         }
     }
