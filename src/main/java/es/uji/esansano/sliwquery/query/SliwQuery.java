@@ -234,20 +234,20 @@ public class SliwQuery {
     }
 
     public void generateValidatedCSV(User user, DateTime from, DateTime to) {
-        String fileName = "data/" + user.getName() + "_validated.csv";
+        String fileName = "data/" + user.getName() + "_train.csv";
         int n = writeCSV(user, from, to, true, "", fileName);
         System.out.println("Writing csv file with validated data for user " + user.getName());
         System.out.println(n + " observations written.");
     }
 
-    private int generateTrainingCSV(User user, DateTime from, DateTime to, String label) {
-        String fileName = "data/" + user.getName() + "_" + String.valueOf(from.getMillis()) +
+    private int generateLabeledTestCSV(User user, DateTime from, DateTime to, String label) {
+        String fileName = "data/" + user.getName() + "_test_" + String.valueOf(from.getMillis()) +
                 "_" + String.valueOf(to.getMillis()) + "_" + label.toLowerCase() + ".csv";
         return writeCSV(user, from, to, false, label, fileName);
     }
 
     private List<String> getBSSIDList(User user) {
-        String fileName = "data/" + user.getName() + "_validated.csv";
+        String fileName = "data/" + user.getName() + "_train.csv";
         try {
             BufferedReader csvFile = new BufferedReader(new FileReader(fileName));
             ArrayList<String> bssids = new ArrayList<>(Arrays.asList(csvFile.readLine().split(",")));
@@ -259,10 +259,10 @@ public class SliwQuery {
         return null;
     }
 
-    public void generateTrainingCSV(User user) {
+    public void generateLabeledTestCSV(User user) {
         List<Interval> intervals = Utils.getIntervals(user.getName());
         for (Interval interval: intervals) {
-            int n = generateTrainingCSV(user, interval.getFromDate(), interval.getToDate(), interval.getLocation());
+            int n = generateLabeledTestCSV(user, interval.getFromDate(), interval.getToDate(), interval.getLocation());
             System.out.println("Writing csv file with labelled data for user " + user.getName());
             System.out.println(interval);
             System.out.println(n + " observations written.");
