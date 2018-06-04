@@ -56,3 +56,5 @@ fabric.properties
 \.idea/
 
 sliwquery\.iml
+
+!data/emilio.csv
