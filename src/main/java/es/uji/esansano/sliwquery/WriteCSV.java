@@ -24,6 +24,6 @@ public class WriteCSV {
         controlQuery.generateValidatedCSV(user, from, to);
 
         // Save training data in csv format
-        controlQuery.generateTrainingCSV(user);
+        controlQuery.generateLabeledTestCSV(user);
     }
 }
