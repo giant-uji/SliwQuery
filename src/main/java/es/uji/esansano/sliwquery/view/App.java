@@ -19,6 +19,9 @@ import java.time.LocalTime;
 import java.util.Map;
 
 public class App {
+    private static final SliwQuery seniorQuery = new SliwQuery(9300);
+    private static final SliwQuery controlQuery = new SliwQuery(9500);
+
     private JPanel panelMain;
 
     private JTextField thresholdField;
@@ -37,24 +40,17 @@ public class App {
     private TimePicker fromTimePicker;
     private TimePicker toTimePicker;
     private JButton buttonCopy;
+    private JRadioButton seniorMonitoringRadioButton;
+    private JRadioButton controlMonitoringRadioButton;
 
     private Map<String, User> userMap;
     private String userName = "";
+    private SliwQuery activeQuery;
 
     public App() {
 
-
-        SliwQuery seniorQuery = new SliwQuery(9300);
-        SliwQuery controlQuery = new SliwQuery(9500);
-
-
-        userMap = seniorQuery.getUserMap();
-        for (Map.Entry<String, User> entry : userMap.entrySet()) {
-            String [] splitKey = entry.getKey().split(" ");
-            if (!splitKey[0].equals("borrar"))
-                usersBox.addItem(entry.getKey());
-        }
-
+        activeQuery = seniorQuery;
+        createList();
         setDefaultValues();
 
         usersBox.addItemListener(new ItemListener() {
@@ -66,7 +62,7 @@ public class App {
         buttonReport.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                makeReport(seniorQuery);
+                makeReport(activeQuery);
             }
         });
         buttonCopy.addActionListener(new ActionListener() {
@@ -84,6 +80,24 @@ public class App {
                 setDefaultValues();
             }
         });
+        seniorMonitoringRadioButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                activeQuery = seniorQuery;
+                usersBox.removeAllItems();
+                resultArea.setText("");
+                createList();
+            }
+        });
+        controlMonitoringRadioButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                activeQuery = controlQuery;
+                usersBox.removeAllItems();
+                resultArea.setText("");
+                createList();
+            }
+        });
     }
 
     public static void main(String[] args) {
@@ -92,6 +106,15 @@ public class App {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);
+    }
+
+    public void createList() {
+        userMap = activeQuery.getUserMap();
+        for (Map.Entry<String, User> entry : userMap.entrySet()) {
+            String [] splitKey = entry.getKey().split(" ");
+            if (!splitKey[0].equals("borrar"))
+                usersBox.addItem(entry.getKey());
+        }
     }
 
     public void makeReport(SliwQuery query) {
