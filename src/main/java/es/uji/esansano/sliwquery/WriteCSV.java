@@ -13,14 +13,14 @@ public class WriteCSV {
     public static void main(String[] args) {
 
         // Get user data by name
-        String userName = "emilio";
+        String userName = "arturo";
         SliwQuery controlQuery = new SliwQuery(PORT);
         Map<String, User> userMap = controlQuery.getUserMap();
         User user = userMap.get(userName);
 
         // Save validated data in csv format
-        DateTime from = new DateTime(2018, 6, 1, 21, 0);
-        DateTime to = new DateTime(2018, 6, 4, 10, 0);
+        DateTime from = new DateTime(2018, 6, 2, 00, 0);
+        DateTime to = new DateTime(2018, 6, 5, 21, 0);
         controlQuery.generateValidatedCSV(user, from, to);
 
         // Save training data in csv format
