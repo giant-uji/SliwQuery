@@ -189,4 +189,19 @@ public class Report {
     public void setUNKNOWN_INTERVAL(int value) {
         UNKNOWN_INTERVAL = value;
     }
+
+    @Override
+    public String toString() {
+        return "Report{" +
+                "UNKNOWN_INTERVAL=" + UNKNOWN_INTERVAL +
+                ", user='" + user + '\'' +
+                ", fromDate=" + fromDate +
+                ", toDate=" + toDate +
+                ", intervals=" + intervals +
+                ", samples=" + samples +
+                ", samplesWithScan=" + samplesWithScan +
+                ", timeFirstSample=" + timeFirstSample +
+                ", timeLastSample=" + timeLastSample +
+                '}';
+    }
 }

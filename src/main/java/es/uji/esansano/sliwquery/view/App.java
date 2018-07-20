@@ -42,6 +42,7 @@ public class App {
     private JButton buttonCopy;
     private JRadioButton seniorMonitoringRadioButton;
     private JRadioButton controlMonitoringRadioButton;
+    private JButton buttonAll;
 
     private Map<String, User> userMap;
     private String userName = "";
@@ -63,6 +64,12 @@ public class App {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 makeReport(activeQuery);
+            }
+        });
+        buttonAll.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                makeAllReports(activeQuery);
             }
         });
         buttonCopy.addActionListener(new ActionListener() {
@@ -112,7 +119,7 @@ public class App {
         userMap = activeQuery.getUserMap();
         for (Map.Entry<String, User> entry : userMap.entrySet()) {
             String [] splitKey = entry.getKey().split(" ");
-            if (!splitKey[0].equals("borrar") && !splitKey[0].equals("test"))
+            if (!splitKey[0].equals("borrar") && !splitKey[0].equals("test1") && !splitKey[0].equals("prueba1"))
                 usersBox.addItem(entry.getKey());
         }
     }
@@ -141,6 +148,39 @@ public class App {
         String reportResult = Utils.getReport(report, threshhold, null, null);
 
         resultArea.setText(reportResult);
+    }
+
+    public void makeAllReports(SliwQuery query) {
+        int dayFROM = fromDatePicker.getDate().getDayOfMonth();
+        int monthFROM = fromDatePicker.getDate().getMonthValue();
+        int yearFROM = fromDatePicker.getDate().getYear();
+        int fromHour = fromTimePicker.getTime().getHour();
+        int fromMin = fromTimePicker.getTime().getMinute();
+
+        int dayTO = toDatePicker.getDate().getDayOfMonth();
+        int monthTO = toDatePicker.getDate().getMonthValue();
+        int yearTO = toDatePicker.getDate().getYear();
+        int toHour = toTimePicker.getTime().getHour();
+        int toMin = toTimePicker.getTime().getMinute();
+
+        DateTime FROM = new DateTime(yearFROM, monthFROM, dayFROM, fromHour, fromMin);
+        DateTime TO = new DateTime(yearTO, monthTO, dayTO, toHour, toMin);
+
+        resultArea.setText("");
+
+         for (Map.Entry entry : userMap.entrySet()) {
+             User user = userMap.get(entry.getKey());
+             Report report = query.getReport(user, FROM, TO);
+             report.setUNKNOWN_INTERVAL(Integer.valueOf(intervalField.getText()));
+             int threshhold = Integer.valueOf(thresholdField.getText());
+
+             String reportResult = Utils.getReport(report, threshhold, null, null);
+
+             if (resultArea.getText().length() == 0)
+                 resultArea.setText(reportResult);
+             else
+                 resultArea.setText(resultArea.getText() + reportResult);
+        }
     }
 
     public void setDefaultValues() {

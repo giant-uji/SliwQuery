@@ -76,7 +76,7 @@ public class SliwQuery {
     }
 
 
-    private List<Sample> getSamples(User user, DateTime from, DateTime to, boolean valid) {
+    public List<Sample> getSamples(User user, DateTime from, DateTime to, boolean valid) {
         List<Sample> samples = new ArrayList<Sample>();
         MLServiceImpl mlService = new MLServiceImpl();
 
